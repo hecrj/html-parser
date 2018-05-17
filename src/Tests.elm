@@ -17,6 +17,21 @@ testParse s ast =
     testParseAll s [ ast ]
 
 
+testError : String -> (() -> Expectation)
+testError s =
+    \_ ->
+        let
+            failed =
+                case HtmlParser.run s of
+                    Ok _ ->
+                        False
+
+                    Err _ ->
+                        True
+        in
+        Expect.true s failed
+
+
 textNodeTests : Test
 textNodeTests =
     describe "TextNode"
@@ -72,41 +87,6 @@ nodeTests =
         ]
 
 
-
--- see https://html.spec.whatwg.org/multipage/syntax.html#optional-tags
-
-
-optionalEndTagTests : Test
-optionalEndTagTests =
-    describe "OptionalEndTag"
-        [ test "ul" (testParse "<ul><li></li></ul>" (Element "ul" [] [ Element "li" [] [] ]))
-        , test "ul" (testParse "<ul><li></ul>" (Element "ul" [] [ Element "li" [] [] ]))
-        , test "ul" (testParse "<ul><li><li></ul>" (Element "ul" [] [ Element "li" [] [], Element "li" [] [] ]))
-        , test "ul" (testParse "<ul><li></li><li></ul>" (Element "ul" [] [ Element "li" [] [], Element "li" [] [] ]))
-        , test "ul" (testParse "<ul><li><li></li></ul>" (Element "ul" [] [ Element "li" [] [], Element "li" [] [] ]))
-        , test "ul" (testParse "<ul><li><ul></ul></ul>" (Element "ul" [] [ Element "li" [] [ Element "ul" [] [] ] ]))
-        , test "ul" (testParse "<ul> <li> <li> </ul>" (Element "ul" [] [ Text " ", Element "li" [] [ Text " " ], Element "li" [] [ Text " " ] ]))
-        , test "ol" (testParse "<ol><li></ol>" (Element "ol" [] [ Element "li" [] [] ]))
-        , test "tr" (testParse "<tr><td></tr>" (Element "tr" [] [ Element "td" [] [] ]))
-        , test "tr" (testParse "<tr><td><td></tr>" (Element "tr" [] [ Element "td" [] [], Element "td" [] [] ]))
-        , test "tr" (testParse "<tr><th></tr>" (Element "tr" [] [ Element "th" [] [] ]))
-        , test "tr" (testParse "<tr><th><th></tr>" (Element "tr" [] [ Element "th" [] [], Element "th" [] [] ]))
-        , test "tr" (testParse "<tr><th><td></tr>" (Element "tr" [] [ Element "th" [] [], Element "td" [] [] ]))
-        , test "tr" (testParse "<tr><td><th></tr>" (Element "tr" [] [ Element "td" [] [], Element "th" [] [] ]))
-        , test "tbody" (testParse "<tbody><tr><td></tbody>" (Element "tbody" [] [ Element "tr" [] [ Element "td" [] [] ] ]))
-        , test "tbody" (testParse "<tbody><tr><th><td></tbody>" (Element "tbody" [] [ Element "tr" [] [ Element "th" [] [], Element "td" [] [] ] ]))
-        , test "tbody" (testParse "<tbody><tr><td><tr><td></tbody>" (Element "tbody" [] [ Element "tr" [] [ Element "td" [] [] ], Element "tr" [] [ Element "td" [] [] ] ]))
-        , test "tbody" (testParse "<tbody><tr><th><td><tr><th><td></tbody>" (Element "tbody" [] [ Element "tr" [] [ Element "th" [] [], Element "td" [] [] ], Element "tr" [] [ Element "th" [] [], Element "td" [] [] ] ]))
-        , test "table" (testParse "<table><caption></table>" (Element "table" [] [ Element "caption" [] [] ]))
-        , test "table" (testParse "<table><caption><col></table>" (Element "table" [] [ Element "caption" [] [], Element "col" [] [] ]))
-        , test "table" (testParse "<table><caption><colgroup><col></table>" (Element "table" [] [ Element "caption" [] [], Element "colgroup" [] [ Element "col" [] [] ] ]))
-        , test "table" (testParse "<table><colgroup><col></table>" (Element "table" [] [ Element "colgroup" [] [ Element "col" [] [] ] ]))
-        , test "table" (testParse "<table><thead><tr><th><tbody></table>" (Element "table" [] [ Element "thead" [] [ Element "tr" [] [ Element "th" [] [] ] ], Element "tbody" [] [] ]))
-        , test "html" (testParse "<html>a" (Element "html" [] [ Text "a" ]))
-        , test "html" (testParse "<html>a<head>b<body>c" (Element "html" [] [ Text "a", Element "head" [] [ Text "b" ], Element "body" [] [ Text "c" ] ]))
-        ]
-
-
 scriptTests : Test
 scriptTests =
     describe "Script"
@@ -154,10 +134,10 @@ attributeTests =
         ]
 
 
-testInvalid : String -> String -> (() -> Expectation)
-testInvalid included s =
-    \_ ->
-        Expect.true "" <| String.contains included <| Debug.toString <| HtmlParser.run s
+errorTests : Test
+errorTests =
+    describe "Errors"
+        [ test "invalid closing tag" (testError "<a><br></p>") ]
 
 
 suite : Test
@@ -167,4 +147,5 @@ suite =
         , nodeTests
         , commentTests
         , attributeTests
+        , errorTests
         ]

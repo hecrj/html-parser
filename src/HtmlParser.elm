@@ -32,7 +32,8 @@ node : Parser Node
 node =
     Parser.oneOf
         [ text
-        , tagOrComment
+        , Parser.backtrackable tag
+        , comment
         ]
 
 
@@ -93,35 +94,30 @@ numericCharacterReference =
 -- Element
 
 
-tagOrComment : Parser Node
-tagOrComment =
+tag : Parser Node
+tag =
     Parser.succeed identity
         |. Parser.chompIf ((==) '<')
-        |= Parser.oneOf
-            [ tagNameAndAttributes
-                |. Parser.chompWhile isSpaceCharacter
-                |. Parser.chompIf ((==) '>')
-                |> Parser.andThen
-                    (\( name, attributes ) ->
-                        if isVoidElement name then
-                            Parser.succeed (Element name attributes [])
+        |= tagNameAndAttributes
+        |. Parser.chompWhile isSpaceCharacter
+        |. Parser.chompIf ((==) '>')
+        |> Parser.andThen
+            (\( name, attributes ) ->
+                if isVoidElement name then
+                    Parser.succeed (Element name attributes [])
 
-                        else
-                            Parser.commit (Element name attributes)
-                                |= many (Parser.backtrackable node)
-                                |. closingTag name
-                    )
-            , Parser.succeed Comment
-                |. Parser.token "!--"
-                |= (Parser.chompUntil "-->" |> Parser.getChompedString)
-                |. Parser.token "-->"
-            ]
+                else
+                    Parser.succeed (Element name attributes)
+                        |= many (Parser.backtrackable node)
+                        |. closingTag name
+            )
 
 
 tagNameAndAttributes : Parser ( String, List Attribute )
 tagNameAndAttributes =
     Parser.succeed Tuple.pair
         |= tagName
+        |. Parser.commit ()
         |= (Parser.chompWhile isSpaceCharacter
                 |> Parser.getChompedString
                 |> Parser.andThen
@@ -237,6 +233,7 @@ closingTag name =
     in
     Parser.chompIf ((==) '<')
         |. Parser.chompIf ((==) '/')
+        |. Parser.commit ()
         |. chompName
         |. Parser.chompWhile isSpaceCharacter
         |. Parser.chompIf ((==) '>')
@@ -249,7 +246,9 @@ closingTag name =
 comment : Parser Node
 comment =
     Parser.succeed Comment
-        |. Parser.token "<!--"
+        |. Parser.token "<!"
+        |. Parser.commit ()
+        |. Parser.token "--"
         |= Parser.getChompedString (Parser.chompUntil "-->")
         |. Parser.token "-->"
 

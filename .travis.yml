@@ -1,0 +1,11 @@
+sudo: false
+
+cache:
+  yarn: true
+
+install:
+  - npm install -g elm elm-test@beta elm-format
+
+script:
+  - elm-format --validate src tests
+  - elm-test

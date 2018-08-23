@@ -1,14 +1,19 @@
-module HtmlParser exposing (Node(..), run)
+module Html.Parser exposing (run, Node(..))
+
+{-| Parse HTML 5 in Elm.
+See <https://www.w3.org/TR/html5/syntax.html>
+
+@docs run, Node
+
+-}
 
 import Dict exposing (Dict)
+import Hex
 import Parser exposing ((|.), (|=), Parser)
 
 
-
--- An HTML 5 parser in Elm
--- See https://www.w3.org/TR/html5/syntax.html
-
-
+{-| Run the parser!
+-}
 run : String -> Result (List Parser.DeadEnd) (List Node)
 run =
     Parser.run (oneOrMore "node" node)
@@ -18,6 +23,13 @@ run =
 -- Node
 
 
+{-| An HTML node. It can either be:
+
+  - Text
+  - Element (with its **tag name**, **attributes** and **children**)
+  - Comment
+
+-}
 type Node
     = Text String
     | Element String (List Attribute) (List Node)
@@ -320,9 +332,12 @@ hexadecimal =
         |> Parser.getChompedString
         |> Parser.andThen
             (\hex ->
-                String.toInt ("0x" ++ hex)
-                    |> Maybe.map Parser.succeed
-                    |> Maybe.withDefault (Parser.problem "invalid hexadecimal value")
+                case Hex.fromString (String.toLower hex) of
+                    Ok value ->
+                        Parser.succeed value
+
+                    Err error ->
+                        Parser.problem error
             )
 
 

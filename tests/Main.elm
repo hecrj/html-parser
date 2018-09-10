@@ -84,6 +84,8 @@ nodeTests =
         , test "start-only-tag6" (testParse "<a><br><br></a>" (Element "a" [] [ Element "br" [] [], Element "br" [] [] ]))
         , test "start-only-tag7" (testParse "<a><br><img><hr><meta></a>" (Element "a" [] [ Element "br" [] [], Element "img" [] [], Element "hr" [] [], Element "meta" [] [] ]))
         , test "start-only-tag8" (testParse "<a>foo<br>bar</a>" (Element "a" [] [ Text "foo", Element "br" [] [], Text "bar" ]))
+        , test "self-closing-tag1" (testParse "<br/>" (Element "br" [] []))
+        , test "self-closing-tag2" (testParse "<br />" (Element "br" [] []))
         ]
 
 

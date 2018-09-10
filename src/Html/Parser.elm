@@ -45,6 +45,7 @@ node =
     Parser.oneOf
         [ text
         , Parser.backtrackable tag
+        , Parser.backtrackable selfClosingTag
         , comment
         ]
 
@@ -123,6 +124,16 @@ tag =
                         |= many (Parser.backtrackable node)
                         |. closingTag name
             )
+
+
+selfClosingTag : Parser Node
+selfClosingTag =
+    Parser.succeed identity
+        |. Parser.chompIf ((==) '<')
+        |= tagNameAndAttributes
+        |. Parser.chompWhile isSpaceCharacter
+        |. Parser.symbol "/>"
+        |> Parser.map (\( name, attributes ) -> Element name attributes [])
 
 
 tagNameAndAttributes : Parser ( String, List Attribute )

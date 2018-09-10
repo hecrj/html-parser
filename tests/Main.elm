@@ -86,6 +86,7 @@ nodeTests =
         , test "start-only-tag8" (testParse "<a>foo<br>bar</a>" (Element "a" [] [ Text "foo", Element "br" [] [], Text "bar" ]))
         , test "self-closing-tag1" (testParse "<br/>" (Element "br" [] []))
         , test "self-closing-tag2" (testParse "<br />" (Element "br" [] []))
+        , test "self-closing-tag3" (testParse "<link href=\"something\" rel=\"something else\"/>" (Element "link" [ ( "href", "something" ), ( "rel", "something else" ) ] []))
         ]
 
 

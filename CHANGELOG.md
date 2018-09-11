@@ -6,10 +6,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.0.1] - 2018-09-11
+### Added
+- Support void elements with a closing slash (like `<br />`, etc.).
+
 ## [1.0.0] - 2018-08-23
 ### Added
 - Initial release!
 - `Html.Parser.run`
 
 
-[Unreleased]: https://github.com/hecrj/html-parser/compare/1.0.0...HEAD
+[Unreleased]: https://github.com/hecrj/html-parser/compare/1.0.1...HEAD
+[1.0.1]: https://github.com/hecrj/html-parser/compare/1.0.0...1.0.1

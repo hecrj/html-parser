@@ -113,14 +113,19 @@ tag =
         |= tagName
         |. Parser.chompWhile isSpaceCharacter
         |= tagAttributes
-        |. Parser.chompIf ((==) '>')
         |> Parser.andThen
             (\( name, attributes ) ->
                 if isVoidElement name then
                     Parser.succeed (Element name attributes [])
+                        |. Parser.oneOf
+                            [ Parser.chompIf ((==) '/')
+                            , Parser.succeed ()
+                            ]
+                        |. Parser.chompIf ((==) '>')
 
                 else
                     Parser.succeed (Element name attributes)
+                        |. Parser.chompIf ((==) '>')
                         |= many (Parser.backtrackable node)
                         |. closingTag name
             )

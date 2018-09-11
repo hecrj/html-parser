@@ -133,7 +133,8 @@ tagName =
 
 
 tagAttributes : Parser (List Attribute)
-tagAttributes = many tagAttribute
+tagAttributes =
+    many tagAttribute
 
 
 tagAttribute : Parser Attribute

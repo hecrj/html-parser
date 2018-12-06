@@ -9,6 +9,7 @@ See <https://www.w3.org/TR/html5/syntax.html>
 
 import Dict exposing (Dict)
 import Hex
+import Html.Parser.NamedCharacterReferences as NamedCharacterReferences
 import Parser exposing ((|.), (|=), Parser)
 
 
@@ -81,7 +82,7 @@ namedCharacterReference =
     Parser.getChompedString (chompOneOrMore Char.isAlpha)
         |> Parser.map
             (\reference ->
-                Dict.get reference namedCharacterReferences
+                Dict.get reference NamedCharacterReferences.dict
                     |> Maybe.withDefault ("&" ++ reference ++ ";")
             )
 
@@ -344,19 +345,3 @@ oneOrMore type_ parser_ =
                     Parser.succeed (Parser.Done (List.reverse list))
                 ]
         )
-
-
-
--- Addendum
-
-
-namedCharacterReferences : Dict String String
-namedCharacterReferences =
-    -- TODO: Complete this
-    [ ( "amp", "&" )
-    , ( "lt", "<" )
-    , ( "gt", ">" )
-    , ( "nbsp", " " )
-    , ( "apos", "'" )
-    ]
-        |> Dict.fromList

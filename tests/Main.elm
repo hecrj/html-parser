@@ -107,12 +107,11 @@ commentTests : Test
 commentTests =
     describe "Comment"
         [ test "basic1" (testParse """<!---->""" (Comment ""))
-
-        --, test "basic" (testParse """<!--foo\t\x0D
-        -->""" (Comment "foo\t\x0D\n "))
         , test "basic2" (testParse """<!--<div></div>-->""" (Comment "<div></div>"))
         , test "basic3" (testParse """<div><!--</div>--></div>""" (Element "div" [] [ Comment "</div>" ]))
         , test "basic4" (testParse """<!--<!---->""" (Comment "<!--"))
+        , test "basic5" (testParse """<!--foo\t\u{000D}
+        -->""" (Comment "foo\t\u{000D}\n        "))
         ]
 
 

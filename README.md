@@ -22,4 +22,5 @@ on the [Elm Slack][elm-slack]. I am always happy to talk!
 ## Credits
   * [`jinjor/elm-html-parser`][jinjor] for most of the tests.
 
+[elm-slack]: https://elmlang.herokuapp.com
 [jinjor]: https://github.com/jinjor/elm-html-parser

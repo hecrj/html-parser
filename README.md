@@ -10,7 +10,10 @@ Html.Parser.run "<div><p>Hello, world!</p></div>"
 ```
 
 ## Limitations
-  * `<script>` tags are not fully supported yet! Feel free to contribute!
+  * `<script>` tags are not fully supported.
+  * SVG is not supported.
+
+Feel free to contribute!
 
 
 ## Contributing / Feedback

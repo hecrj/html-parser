@@ -2,10 +2,24 @@
 
 Parse HTML 5 in Elm 0.19!
 
-# Warning!
+```elm
+import Html.Parser
 
-This is very WIP, and it probably has _many_ issues still. I have only
-been able to pass the sane tests in the [`jinjor/elm-html-parser`][jinjor] package
-for Elm 0.18. Feel free to fork, contribute, add new tests and/or open issues!
+Html.Parser.run "<div><p>Hello, world!<p></div>"
+-- => Element "div" [] [ Element "p" [] [ Text "Hello, world!" ] ]
+```
+
+## Limitations
+  * `<script>` tags are not fully supported yet! Feel free to contribute!
+
+
+## Contributing / Feedback
+
+Feel free to fork and open issues or pull requests. You can also contact me (@hecrj)
+on the [Elm Slack][elm-slack]. I am always happy to talk!
+
+
+## Credits
+  * [`jinjor/elm-html-parser`][jinjor] for most of the tests.
 
 [jinjor]: https://github.com/jinjor/elm-html-parser

@@ -5,8 +5,8 @@ Parse HTML 5 in Elm 0.19!
 ```elm
 import Html.Parser
 
-Html.Parser.run "<div><p>Hello, world!<p></div>"
--- => Element "div" [] [ Element "p" [] [ Text "Hello, world!" ] ]
+Html.Parser.run "<div><p>Hello, world!</p></div>"
+-- => Ok [ Element "div" [] [ Element "p" [] [ Text "Hello, world!" ] ] ]
 ```
 
 ## Limitations

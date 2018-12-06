@@ -14,6 +14,10 @@ import Parser exposing ((|.), (|=), Parser)
 
 
 {-| Run the parser!
+
+    run "<div><p>Hello, world!</p></div>"
+    -- => Ok [ Element "div" [] [ Element "p" [] [ Text "Hello, world!" ] ] ]
+
 -}
 run : String -> Result (List Parser.DeadEnd) (List Node)
 run =

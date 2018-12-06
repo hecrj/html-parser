@@ -1,7 +1,4 @@
-module Html.Parser.Util exposing
-    ( toVirtualDom
-    , toAttribute, toVirtualDomEach
-    )
+module Html.Parser.Util exposing (toVirtualDom, toVirtualDomSvg)
 
 {-| Utility functions that may help you digging into the contents.
 

@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.1.0] - 2018-12-06
+### Added
+- `Html.Parser.Util` to transform parser nodes into virtual dom nodes.
+- Support for all [named character references][named-character-references].
+
 ## [1.0.1] - 2018-09-11
 ### Added
 - Support void elements with a closing slash (like `<br />`, etc.).
@@ -15,6 +20,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Initial release!
 - `Html.Parser.run`
 
+[named-character-references]: https://www.w3.org/TR/html5/syntax.html#named-character-references
 
-[Unreleased]: https://github.com/hecrj/html-parser/compare/1.0.1...HEAD
+[Unreleased]: https://github.com/hecrj/html-parser/compare/1.1.0...HEAD
+[1.1.0]: https://github.com/hecrj/html-parser/compare/1.0.1...1.1.0
 [1.0.1]: https://github.com/hecrj/html-parser/compare/1.0.0...1.0.1

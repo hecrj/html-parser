@@ -35,7 +35,9 @@ testError s =
 textNodeTests : Test
 textNodeTests =
     describe "TextNode"
-        [ test "basic1" (testParse "1" (Text "1"))
+        [ test "empty" (testParseAll "" [])
+        , test "space" (testParse " " (Text " "))
+        , test "basic1" (testParse "1" (Text "1"))
         , test "basic2" (testParse "a" (Text "a"))
         , test "basic3" (testParse "1a" (Text "1a"))
         , test "basic4" (testParse "^" (Text "^"))

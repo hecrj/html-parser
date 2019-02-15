@@ -20,8 +20,12 @@ import Parser exposing ((|.), (|=), Parser)
 
 -}
 run : String -> Result (List Parser.DeadEnd) (List Node)
-run =
-    Parser.run (oneOrMore "node" node)
+run str =
+    if String.isEmpty str then
+        Ok []
+
+    else
+        Parser.run (oneOrMore "node" node) str
 
 
 

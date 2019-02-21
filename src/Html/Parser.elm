@@ -1,9 +1,9 @@
-module Html.Parser exposing (run, Node(..))
+module Html.Parser exposing (run, Node(..), Attribute)
 
 {-| Parse HTML 5 in Elm.
 See <https://www.w3.org/TR/html5/syntax.html>
 
-@docs run, Node
+@docs run, Node, Attribute
 
 -}
 
@@ -45,6 +45,11 @@ type Node
     | Comment String
 
 
+{-| An HTML attribute. For instance:
+
+    ( "href", "https://elm-lang.org" )
+
+-}
 type alias Attribute =
     ( String, String )
 

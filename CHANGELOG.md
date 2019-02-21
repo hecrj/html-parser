@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+
+## [2.1.0] - 2019-02-21
+### Added
+- Expose `Html.Parser.Attribute` type alias so the documentation is complete.
+
 ## [2.0.1] - 2019-02-15
 ### Changed
 - Fix parser erroring when input is an empty string. Thanks to @doanythingfordethklok!
@@ -30,7 +35,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 [named-character-references]: https://www.w3.org/TR/html5/syntax.html#named-character-references
 
-[Unreleased]: https://github.com/hecrj/html-parser/compare/2.0.1...HEAD
+[Unreleased]: https://github.com/hecrj/html-parser/compare/2.1.0...HEAD
+[2.1.0]: https://github.com/hecrj/html-parser/compare/2.0.1...2.1.0
 [2.0.1]: https://github.com/hecrj/html-parser/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/hecrj/html-parser/compare/1.1.0...2.0.0
 [1.1.0]: https://github.com/hecrj/html-parser/compare/1.0.1...1.1.0

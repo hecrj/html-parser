@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.2.0] - 2019-02-27
+### Added
+- Expose `Html.Parser.node` to allow other folks to build different parsers on top of this one!
 
 ## [2.1.0] - 2019-02-21
 ### Added
@@ -35,7 +38,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 [named-character-references]: https://www.w3.org/TR/html5/syntax.html#named-character-references
 
-[Unreleased]: https://github.com/hecrj/html-parser/compare/2.1.0...HEAD
+[Unreleased]: https://github.com/hecrj/html-parser/compare/2.2.0...HEAD
+[2.2.0]: https://github.com/hecrj/html-parser/compare/2.1.0...2.2.0
 [2.1.0]: https://github.com/hecrj/html-parser/compare/2.0.1...2.1.0
 [2.0.1]: https://github.com/hecrj/html-parser/compare/2.0.0...2.0.1
 [2.0.0]: https://github.com/hecrj/html-parser/compare/1.1.0...2.0.0

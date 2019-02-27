@@ -1,9 +1,22 @@
-module Html.Parser exposing (run, Node(..), Attribute)
+module Html.Parser exposing
+    ( run, Node(..), Attribute
+    , node
+    )
 
 {-| Parse HTML 5 in Elm.
 See <https://www.w3.org/TR/html5/syntax.html>
 
 @docs run, Node, Attribute
+
+
+# Parser internals
+
+If you are building a parser of your own using [`elm/parser`][elm-parser] and
+you need to parse HTML... This section is for you!
+
+@docs node
+
+[elm-parser]: https://package.elm-lang.org/packages/elm/parser/latest
 
 -}
 
@@ -54,12 +67,17 @@ type alias Attribute =
     ( String, String )
 
 
+{-| Parses an HTML node.
+
+You can use this in your own parser to add support for HTML 5.
+
+-}
 node : Parser Node
 node =
     Parser.oneOf
         [ text
         , comment
-        , tag
+        , element
         ]
 
 
@@ -120,8 +138,8 @@ numericCharacterReference =
 -- Element
 
 
-tag : Parser Node
-tag =
+element : Parser Node
+element =
     Parser.succeed Tuple.pair
         |. Parser.chompIf ((==) '<')
         |= tagName

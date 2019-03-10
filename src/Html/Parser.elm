@@ -14,9 +14,9 @@ See <https://www.w3.org/TR/html5/syntax.html>
 If you are building a parser of your own using [`elm/parser`][elm-parser] and
 you need to parse HTML... This section is for you!
 
-@docs node
-
 [elm-parser]: https://package.elm-lang.org/packages/elm/parser/latest
+
+@docs node
 
 -}
 

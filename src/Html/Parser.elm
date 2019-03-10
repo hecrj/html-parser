@@ -1,6 +1,6 @@
 module Html.Parser exposing
     ( run, Node(..), Attribute
-    , node
+    , node, nodeToString
     )
 
 {-| Parse HTML 5 in Elm.
@@ -9,14 +9,14 @@ See <https://www.w3.org/TR/html5/syntax.html>
 @docs run, Node, Attribute
 
 
-# Parser internals
+# Internals
 
 If you are building a parser of your own using [`elm/parser`][elm-parser] and
 you need to parse HTML... This section is for you!
 
 [elm-parser]: https://package.elm-lang.org/packages/elm/parser/latest
 
-@docs node
+@docs node, nodeToString
 
 -}
 
@@ -67,7 +67,7 @@ type alias Attribute =
     ( String, String )
 
 
-{-| Parses an HTML node.
+{-| Parse an HTML node.
 
 You can use this in your own parser to add support for HTML 5.
 
@@ -79,6 +79,62 @@ node =
         , comment
         , element
         ]
+
+
+{-| Turn a parser node back into its HTML string.
+
+For instance:
+
+    Element "a"
+        [ ( "href", "https://elm-lang.org" ) ]
+        [ Text "Elm" ]
+        |> toString
+
+Produces `<a href="https://elm-lang.org">Elm</a>`.
+
+-}
+nodeToString : Node -> String
+nodeToString node_ =
+    let
+        attributeToString ( attr, value ) =
+            attr ++ "=\"" ++ value ++ "\""
+    in
+    case node_ of
+        Text text_ ->
+            text_
+
+        Element name attributes children ->
+            let
+                maybeAttributes =
+                    case attributes of
+                        [] ->
+                            ""
+
+                        _ ->
+                            " " ++ String.join "" (List.map attributeToString attributes)
+            in
+            if isVoidElement name then
+                String.concat
+                    [ "<"
+                    , name
+                    , maybeAttributes
+                    , ">"
+                    ]
+
+            else
+                String.concat
+                    [ "<"
+                    , name
+                    , maybeAttributes
+                    , ">"
+                    , String.join "" (List.map nodeToString children)
+                    , "</"
+                    , name
+                    , ">"
+                    ]
+
+        Comment comment_ ->
+            "<!-- " ++ comment_ ++ " -->"
 
 
 

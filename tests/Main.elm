@@ -91,6 +91,41 @@ nodeTests =
         ]
 
 
+nodeToStringTests : Test
+nodeToStringTests =
+    describe "nodeToString"
+        [ test "simple link" <|
+            \_ ->
+                Element "a" [ ( "href", "https://elm-lang.org" ) ] [ Text "Elm" ]
+                    |> Html.Parser.nodeToString
+                    |> Expect.equal "<a href=\"https://elm-lang.org\">Elm</a>"
+        , test "container" <|
+            \_ ->
+                Element "div"
+                    []
+                    [ Element "p" [] [ Text "Hello," ]
+                    , Element "p" [] [ Text "World!" ]
+                    ]
+                    |> Html.Parser.nodeToString
+                    |> Expect.equal "<div><p>Hello,</p><p>World!</p></div>"
+        , test "void element" <|
+            \_ ->
+                Element "br" [] [ Element "a" [] [ Text "should be ignored" ] ]
+                    |> Html.Parser.nodeToString
+                    |> Expect.equal "<br>"
+        , test "comment" <|
+            \_ ->
+                Comment "This is a comment"
+                    |> Html.Parser.nodeToString
+                    |> Expect.equal "<!-- This is a comment -->"
+        , test "text" <|
+            \_ ->
+                Text "Hello, world!"
+                    |> Html.Parser.nodeToString
+                    |> Expect.equal "Hello, world!"
+        ]
+
+
 scriptTests : Test
 scriptTests =
     describe "Script"
@@ -148,6 +183,7 @@ suite =
     describe "HtmlParser"
         [ textNodeTests
         , nodeTests
+        , nodeToStringTests
         , commentTests
         , attributeTests
         , errorTests

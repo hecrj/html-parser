@@ -108,6 +108,15 @@ nodeToStringTests =
                     ]
                     |> Html.Parser.nodeToString
                     |> Expect.equal "<div><p>Hello,</p><p>World!</p></div>"
+        , test "multiple attributes" <|
+            \_ ->
+                Element "a"
+                    [ ( "href", "https://elm-lang.org" )
+                    , ( "alt", "Elm website" )
+                    ]
+                    [ Text "Elm" ]
+                    |> Html.Parser.nodeToString
+                    |> Expect.equal "<a href=\"https://elm-lang.org\" alt=\"Elm website\">Elm</a>"
         , test "void element" <|
             \_ ->
                 Element "br" [] [ Element "a" [] [ Text "should be ignored" ] ]

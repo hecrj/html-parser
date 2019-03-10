@@ -111,7 +111,7 @@ nodeToString node_ =
                             ""
 
                         _ ->
-                            " " ++ String.join "" (List.map attributeToString attributes)
+                            " " ++ String.join " " (List.map attributeToString attributes)
             in
             if isVoidElement name then
                 String.concat

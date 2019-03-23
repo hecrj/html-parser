@@ -88,7 +88,7 @@ For instance:
     Element "a"
         [ ( "href", "https://elm-lang.org" ) ]
         [ Text "Elm" ]
-        |> toString
+        |> nodeToString
 
 Produces `<a href="https://elm-lang.org">Elm</a>`.
 

@@ -55,6 +55,7 @@ textNodeTests =
         , test "decodeD" (testParse "a&nbsp;b" (Text "a\u{00A0}b"))
         , test "decodeE" (testParse "a&nbsp;&nbsp;b" (Text "a\u{00A0}\u{00A0}b"))
         , test "decodeF" (testParse """<img alt="&lt;">""" (Element "img" [ ( "alt", "<" ) ] []))
+        , test "decodeG" (testParse "&#0038;" (Text "&"))
         ]
 
 

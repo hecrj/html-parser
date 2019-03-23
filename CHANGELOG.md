@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.3.2] - 2019-03-23
+### Changed
+- Fix decimal numeric character references failing to parse if they contained leading zeros ([#8](https://github.com/hecrj/html-parser/pull/8/files)). Thanks to @68kHeart!
+- Fix `nodeToString` example in documentation.
+
 ## [2.3.1] - 2019-03-10
 ### Changed
 - `Html.Parser.nodeToString` spaces attributes properly.
@@ -32,12 +37,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [1.1.0] - 2018-12-06
 ### Added
-- `Html.Parser.Util` to transform parser nodes into virtual dom nodes.
+- `Html.Parser.Util` to transform parser nodes into virtual dom nodes ([#3](https://github.com/hecrj/html-parser/pull/3)). Thanks to @ccapndave!
 - Support for all [named character references][named-character-references].
 
 ## [1.0.1] - 2018-09-11
 ### Added
-- Support void elements with a closing slash (like `<br />`, etc.).
+- Support void elements with a closing slash (like `<br />`, etc.) ([#1](https://github.com/hecrj/html-parser/pull/1)). Thanks to @isaacseymour!
 
 ## [1.0.0] - 2018-08-23
 ### Added
@@ -46,7 +51,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 [named-character-references]: https://www.w3.org/TR/html5/syntax.html#named-character-references
 
-[Unreleased]: https://github.com/hecrj/html-parser/compare/2.3.1...HEAD
+[Unreleased]: https://github.com/hecrj/html-parser/compare/2.3.2...HEAD
+[2.3.2]: https://github.com/hecrj/html-parser/compare/2.3.1...2.3.2
 [2.3.1]: https://github.com/hecrj/html-parser/compare/2.3.0...2.3.1
 [2.3.0]: https://github.com/hecrj/html-parser/compare/2.2.0...2.3.0
 [2.2.0]: https://github.com/hecrj/html-parser/compare/2.1.0...2.2.0

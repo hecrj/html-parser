@@ -182,7 +182,9 @@ numericCharacterReference =
                 [ Parser.succeed identity
                     |. Parser.chompIf (\c -> c == 'x' || c == 'X')
                     |= hexadecimal
-                , Parser.int
+                , Parser.succeed identity
+                    |. Parser.chompWhile ((==) '0')
+                    |= Parser.int
                 ]
     in
     Parser.succeed identity

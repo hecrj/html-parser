@@ -89,6 +89,7 @@ nodeTests =
         , test "self-closing-tag1" (testParse "<br/>" (Element "br" [] []))
         , test "self-closing-tag2" (testParse "<br />" (Element "br" [] []))
         , test "self-closing-tag3" (testParse "<link href=\"something\" rel=\"something else\"/>" (Element "link" [ ( "href", "something" ), ( "rel", "something else" ) ] []))
+        , test "web-component-tag" (testParse "<a-web-component></a-web-component>" (Element "a-web-component" [] []))
         ]
 
 
@@ -185,7 +186,9 @@ attributeTests =
 errorTests : Test
 errorTests =
     describe "Errors"
-        [ test "invalid closing tag" (testError "<a><br></p>") ]
+        [ test "invalid closing tag" (testError "<a><br></p>")
+        , test "invalid tag name" (testError "<-></->")
+        ]
 
 
 suite : Test

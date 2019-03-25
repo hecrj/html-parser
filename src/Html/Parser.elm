@@ -223,7 +223,7 @@ element =
 
 tagName : Parser String
 tagName =
-    Parser.getChompedString (chompOneOrMore Char.isAlphaNum)
+    Parser.getChompedString (chompOneOrMore (\c -> Char.isAlphaNum c || c == '-'))
         |> Parser.map String.toLower
 
 

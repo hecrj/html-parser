@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.3.4] - 2019-04-09
+### Changed
+- Treat a non-breaking space (`\u{00a0}`) like a space character. This avoids runtime errors when using `Html.Util.toVirtualDom`. Thanks to @magopian!
+
 ## [2.3.3] - 2019-03-25
 ### Changed
 - Support hyphens in tag names (allows parsing web components). Thanks to @andre-dietrich!
@@ -55,7 +59,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 [named-character-references]: https://www.w3.org/TR/html5/syntax.html#named-character-references
 
-[Unreleased]: https://github.com/hecrj/html-parser/compare/2.3.3...HEAD
+[Unreleased]: https://github.com/hecrj/html-parser/compare/2.3.4...HEAD
+[2.3.4]: https://github.com/hecrj/html-parser/compare/2.3.3...2.3.4
 [2.3.3]: https://github.com/hecrj/html-parser/compare/2.3.2...2.3.3
 [2.3.2]: https://github.com/hecrj/html-parser/compare/2.3.1...2.3.2
 [2.3.1]: https://github.com/hecrj/html-parser/compare/2.3.0...2.3.1

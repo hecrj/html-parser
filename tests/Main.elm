@@ -180,6 +180,9 @@ attributeTests =
         , test "basic13" (testParse """<html xmlns:v="urn:schemas-microsoft-com:vml"></html>""" (Element "html" [ ( "xmlns:v", "urn:schemas-microsoft-com:vml" ) ] []))
         , test "basic14" (testParse """<link rel=stylesheet
         href="">""" (Element "link" [ ( "rel", "stylesheet" ), ( "href", "" ) ] []))
+
+        -- Invalid attribute names shouldn't be parsed: https://github.com/elm/html/issues/46
+        , test "invalid character" (testParse """<p\u{00A0} ></p>""" (Element "p" [] []))
         ]
 
 

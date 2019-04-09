@@ -372,7 +372,7 @@ isTagAttributeCharacter c =
 
 isSpaceCharacter : Char -> Bool
 isSpaceCharacter c =
-    c == ' ' || c == '\t' || c == '\n' || c == '\u{000D}' || c == '\u{000C}'
+    c == ' ' || c == '\t' || c == '\n' || c == '\u{000D}' || c == '\u{000C}' || c == '\u{00A0}'
 
 
 

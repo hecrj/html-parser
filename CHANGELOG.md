@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [2.3.2] - 2019-03-23
 ### Changed
-- Fix decimal numeric character references failing to parse if they contained leading zeros ([#8](https://github.com/hecrj/html-parser/pull/8). Thanks to @68kHeart!
+- Fix decimal numeric character references failing to parse if they contained leading zeros ([#8](https://github.com/hecrj/html-parser/pull/8)). Thanks to @68kHeart!
 - Fix `nodeToString` example in documentation.
 
 ## [2.3.1] - 2019-03-10

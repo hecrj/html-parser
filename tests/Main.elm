@@ -89,6 +89,9 @@ nodeTests =
         , test "self-closing-tag1" (testParse "<br/>" (Element "br" [] []))
         , test "self-closing-tag2" (testParse "<br />" (Element "br" [] []))
         , test "self-closing-tag3" (testParse "<link href=\"something\" rel=\"something else\"/>" (Element "link" [ ( "href", "something" ), ( "rel", "something else" ) ] []))
+        , test "self-closing-tag4" (testParse "<p/>" (Element "p" [] []))
+        , test "self-closing-tag5" (testParse "<p />" (Element "p" [] []))
+        , test "self-closing-tag6" (testParse "<a/>" (Element "a" [] []))
         , test "web-component-tag" (testParse "<a-web-component></a-web-component>" (Element "a-web-component" [] []))
         ]
 

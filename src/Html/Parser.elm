@@ -1,6 +1,7 @@
 module Html.Parser exposing
-    ( run, Node(..), Attribute
+    ( run, Node(..), Document, Attribute
     , node, nodeToString
+    , documentToString, runDocument
     )
 
 {-| Parse HTML 5 in Elm.
@@ -39,6 +40,17 @@ run str =
 
     else
         Parser.run (oneOrMore "node" node) str
+
+
+{-| Run the parser on an entire HTML document
+
+    runDocument "<!--First comment--><!DOCTYPE html><!--Test stuffs--><html></html><!--Footer comment!-->"
+    -- => Ok { preambleComments = ["First comment"], doctype = "", predocComments = ["Test stuffs"], document = ([],[]), postdocComments = ["Footer comment!"] }
+
+-}
+runDocument : String -> Result (List Parser.DeadEnd) Document
+runDocument =
+    Parser.run document
 
 
 
@@ -95,46 +107,81 @@ Produces `<a href="https://elm-lang.org">Elm</a>`.
 -}
 nodeToString : Node -> String
 nodeToString node_ =
-    let
-        attributeToString ( attr, value ) =
-            attr ++ "=\"" ++ value ++ "\""
-    in
     case node_ of
         Text text_ ->
             text_
 
         Element name attributes children ->
-            let
-                maybeAttributes =
-                    case attributes of
-                        [] ->
-                            ""
-
-                        _ ->
-                            " " ++ String.join " " (List.map attributeToString attributes)
-            in
-            if isVoidElement name then
-                String.concat
-                    [ "<"
-                    , name
-                    , maybeAttributes
-                    , ">"
-                    ]
-
-            else
-                String.concat
-                    [ "<"
-                    , name
-                    , maybeAttributes
-                    , ">"
-                    , String.join "" (List.map nodeToString children)
-                    , "</"
-                    , name
-                    , ">"
-                    ]
+            elementToString name attributes children
 
         Comment comment_ ->
-            "<!-- " ++ comment_ ++ " -->"
+            commentToString comment_
+
+
+
+-- Document
+
+
+{-| An HTML document.
+
+This simply separates the document into its component parts, as defined by the [WHATWG Standard][WHATWG]
+
+[WHATWG]: https://html.spec.whatwg.org/#writing
+
+-}
+type alias Document =
+    { preambleComments : List String
+    , doctype : String
+    , predocComments : List String
+    , document : ( List Attribute, List Node )
+    , postdocComments : List String
+    }
+
+
+{-| Parse an HTML document.
+
+You can use this in your own parsers to yank out complete HTML documents.
+
+Wherever you use it, it will consume any valid trailing whitespace and will parse anything that looks like a valid HTML comment at the end. Be careful with weird encodings!
+
+-}
+document : Parser Document
+document =
+    Parser.succeed Document
+        |. Parser.chompWhile isSpaceCharacter
+        |= many (Parser.backtrackable commentString |. Parser.chompWhile isSpaceCharacter)
+        |= doctype
+        |. Parser.chompWhile isSpaceCharacter
+        |= many (Parser.backtrackable commentString |. Parser.chompWhile isSpaceCharacter)
+        |= documentElement
+        |= many (Parser.backtrackable commentString |. Parser.chompWhile isSpaceCharacter)
+
+
+{-| Turn a document back into its HTML string.
+
+For instance:
+
+    { preambleComments = [ "Early!" ]
+    , doctype = "LEGACY \"My legacy string stuff\""
+    , predocComments = [ "Teehee!" ]
+    , document = ( [], [ Element "p" [] [ Text "Got it." ], Element "br" [] [] ] )
+    , postdocComments = [ "Smelly feet" ]
+    }
+        |> nodeToString
+
+Produces `<!--Early!--><!DOCTYPE html LEGACY \"My legacy string stuff\"><!--Teehee!--><html><p>Got it.</p><br></html><!--Smelly feet-->`.
+
+-}
+documentToString : Document -> String
+documentToString doc =
+    [ List.map commentToString doc.preambleComments
+    , List.singleton <| doctypeToString doc.doctype
+    , List.map commentToString doc.predocComments
+    , List.singleton <| elementToString "html" (Tuple.first doc.document) (Tuple.second doc.document)
+    , List.map commentToString doc.postdocComments
+    ]
+        |> List.concat
+        |> String.join ""
 
 
 
@@ -320,17 +367,83 @@ closingTag name =
         |. Parser.chompIf ((==) '>')
 
 
+documentElement : Parser ( List Attribute, List Node )
+documentElement =
+    element
+        |> Parser.andThen
+            (\el ->
+                case el of
+                    Element name attrs nodes ->
+                        if name == "html" then
+                            Parser.succeed ( attrs, nodes )
+
+                        else
+                            Parser.problem ("root element of document was a <" ++ name ++ "> and not <html>")
+
+                    Text _ ->
+                        Parser.problem "found raw text instead of a document"
+
+                    Comment _ ->
+                        Parser.problem "after parsing all comments, found another comment"
+            )
+
+
+elementToString : String -> List Attribute -> List Node -> String
+elementToString name attributes children =
+    let
+        attributeToString ( attr, value ) =
+            attr ++ "=\"" ++ value ++ "\""
+
+        maybeAttributes =
+            case attributes of
+                [] ->
+                    ""
+
+                _ ->
+                    " " ++ String.join " " (List.map attributeToString attributes)
+    in
+    if isVoidElement name then
+        String.concat
+            [ "<"
+            , name
+            , maybeAttributes
+            , ">"
+            ]
+
+    else
+        String.concat
+            [ "<"
+            , name
+            , maybeAttributes
+            , ">"
+            , String.join "" (List.map nodeToString children)
+            , "</"
+            , name
+            , ">"
+            ]
+
+
 
 -- Comment
 
 
 comment : Parser Node
 comment =
-    Parser.succeed Comment
+    Parser.map Comment commentString
+
+
+commentString : Parser String
+commentString =
+    Parser.succeed Basics.identity
         |. Parser.token "<!"
         |. Parser.token "--"
         |= Parser.getChompedString (Parser.chompUntil "-->")
         |. Parser.token "-->"
+
+
+commentToString : String -> String
+commentToString comment_ =
+    "<!--" ++ comment_ ++ "-->"
 
 
 
@@ -373,6 +486,48 @@ isTagAttributeCharacter c =
 isSpaceCharacter : Char -> Bool
 isSpaceCharacter c =
     c == ' ' || c == '\t' || c == '\n' || c == '\u{000D}' || c == '\u{000C}' || c == '\u{00A0}'
+
+
+
+-- Doctype
+
+
+doctype : Parser String
+doctype =
+    Parser.succeed Basics.identity
+        |. Parser.chompIf ((==) '<')
+        |. Parser.chompIf ((==) '!')
+        |= tagName
+        |. chompOneOrMore isSpaceCharacter
+        |> Parser.andThen
+            (\firstWord ->
+                if firstWord /= "doctype" then
+                    Parser.problem ("expected DOCTYPE keyword but found \"" ++ firstWord ++ "\" instead")
+
+                else
+                    Parser.succeed Basics.identity
+                        |= tagName
+                        |. Parser.chompWhile isSpaceCharacter
+                        |> Parser.andThen
+                            (\secondWord ->
+                                if secondWord /= "html" then
+                                    Parser.problem ("expected \"html\" keyword but found \"" ++ secondWord ++ "\" instead")
+
+                                else
+                                    (Parser.getChompedString <| Parser.chompUntil ">")
+                                        |. Parser.chompIf ((==) '>')
+                            )
+            )
+
+
+doctypeToString : String -> String
+doctypeToString str =
+    case str of
+        "" ->
+            "<!DOCTYPE html>"
+
+        _ ->
+            "<!DOCTYPE html " ++ str ++ ">"
 
 
 

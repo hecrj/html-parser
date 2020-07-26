@@ -1,7 +1,7 @@
 module Html.Parser exposing
-    ( run, Node(..), Document, Attribute
+    ( run, Node(..), Attribute
     , node, nodeToString
-    , documentToString, runDocument
+    , Document, documentToString, runDocument
     )
 
 {-| Parse HTML 5 in Elm.

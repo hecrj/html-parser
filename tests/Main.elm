@@ -2,7 +2,7 @@ module Main exposing (suite)
 
 import Dict
 import Expect exposing (Expectation)
-import Html.Parser exposing (Node(..))
+import Html.Parser exposing (Document, Node(..))
 import Test exposing (Test, describe, test)
 
 
@@ -17,12 +17,33 @@ testParse s ast =
     testParseAll s [ ast ]
 
 
+testParseDocument : String -> Document -> (() -> Expectation)
+testParseDocument s doc =
+    \_ ->
+        Expect.equal (Ok doc) (Html.Parser.runDocument s)
+
+
 testError : String -> (() -> Expectation)
 testError s =
     \_ ->
         let
             failed =
                 case Html.Parser.run s of
+                    Ok _ ->
+                        False
+
+                    Err _ ->
+                        True
+        in
+        Expect.true s failed
+
+
+testDocumentError : String -> (() -> Expectation)
+testDocumentError s =
+    \_ ->
+        let
+            failed =
+                case Html.Parser.runDocument s of
                     Ok _ ->
                         False
 
@@ -128,12 +149,37 @@ nodeToStringTests =
             \_ ->
                 Comment "This is a comment"
                     |> Html.Parser.nodeToString
-                    |> Expect.equal "<!-- This is a comment -->"
+                    |> Expect.equal "<!--This is a comment-->"
         , test "text" <|
             \_ ->
                 Text "Hello, world!"
                     |> Html.Parser.nodeToString
                     |> Expect.equal "Hello, world!"
+        ]
+
+
+documentTests : Test
+documentTests =
+    describe "Document"
+        [ test "minimal" (testParseDocument "<!DOCTYPE html><html></html>" (Html.Parser.Document [] "" [] ( [], [] ) []))
+        , test "example1" (testParseDocument "<!--Early!--><!DOCTYPE html LEGACY \"My legacy string stuff\"><!--Teehee!--><html><p>Got it.</p><br></html><!--Smelly feet-->" { doctype = "LEGACY \"My legacy string stuff\"", document = ( [], [ Element "p" [] [ Text "Got it." ], Element "br" [] [] ] ), postdocComments = [ "Smelly feet" ], preambleComments = [ "Early!" ], predocComments = [ "Teehee!" ] })
+        , test "recapitalized1" (testParseDocument "<!--EaRlY!--><!DoCtYpE HtMl lEgAcY \"mY LeGaCy StRiNg StUfF\"><!--tEeHeE!--><HtMl><P>gOt It.</P><bR></HtMl><!--sMeLlY fEeT-->" { doctype = "lEgAcY \"mY LeGaCy StRiNg StUfF\"", document = ( [], [ Element "p" [] [ Text "gOt It." ], Element "br" [] [] ] ), postdocComments = [ "sMeLlY fEeT" ], preambleComments = [ "EaRlY!" ], predocComments = [ "tEeHeE!" ] })
+        ]
+
+
+documentToStringTests : Test
+documentToStringTests =
+    describe "documentToString"
+        [ test "minimal" <|
+            \_ ->
+                Html.Parser.Document [] "" [] ( [], [] ) []
+                    |> Html.Parser.documentToString
+                    |> Expect.equal "<!DOCTYPE html><html></html>"
+        , test "example1" <|
+            \_ ->
+                { doctype = "LEGACY \"My legacy string stuff\"", document = ( [], [ Element "p" [] [ Text "Got it." ], Element "br" [] [] ] ), postdocComments = [ "Smelly feet" ], preambleComments = [ "Early!" ], predocComments = [ "Teehee!" ] }
+                    |> Html.Parser.documentToString
+                    |> Expect.equal "<!--Early!--><!DOCTYPE html LEGACY \"My legacy string stuff\"><!--Teehee!--><html><p>Got it.</p><br></html><!--Smelly feet-->"
         ]
 
 
@@ -191,6 +237,9 @@ errorTests =
     describe "Errors"
         [ test "invalid closing tag" (testError "<a><br></p>")
         , test "invalid tag name" (testError "<-></->")
+        , test "wrong DOCTYPE keyword" (testDocumentError "<!DOCTYRP html><html></html>")
+        , test "wrong DOCTYPE" (testDocumentError "<!DOCTYPE httl><html></html>")
+        , test "wrong html tag" (testDocumentError "<!DOCTYPE html><document></document>")
         ]
 
 
@@ -200,6 +249,8 @@ suite =
         [ textNodeTests
         , nodeTests
         , nodeToStringTests
+        , documentTests
+        , documentToStringTests
         , commentTests
         , attributeTests
         , errorTests

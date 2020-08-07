@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [2.4.0] - 2020-08-07
+### Added
+- Support for parsing whole HTML documents ([#15](https://github.com/hecrj/html-parser/pull/15)). Thanks to @4onen!
+
 ## [2.3.4] - 2019-04-09
 ### Changed
 - Treat a non-breaking space (`\u{00a0}`) like a space character. This avoids runtime errors when using `Html.Util.toVirtualDom`. Thanks to @magopian! See [#10](https://github.com/hecrj/html-parser/issues/10).

@@ -1,13 +1,12 @@
 module Html.Parser exposing
-    ( run, Node(..), Attribute
-    , node, nodeToString
-    , Document, documentToString, runDocument
+    ( run, runDocument, Node(..), Document, Attribute
+    , node, nodeToString, documentToString
     )
 
 {-| Parse HTML 5 in Elm.
 See <https://www.w3.org/TR/html5/syntax.html>
 
-@docs run, Node, Attribute
+@docs run, runDocument, Node, Document, Attribute
 
 
 # Internals
@@ -17,7 +16,7 @@ you need to parse HTML... This section is for you!
 
 [elm-parser]: https://package.elm-lang.org/packages/elm/parser/latest
 
-@docs node, nodeToString
+@docs node, nodeToString, documentToString
 
 -}
 

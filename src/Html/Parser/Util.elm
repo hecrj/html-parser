@@ -9,10 +9,9 @@ module Html.Parser.Util exposing (toVirtualDom)
 
 -}
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Attribute, Html, text)
+import Html.Attributes exposing (attribute)
 import Html.Parser exposing (Node(..))
-import VirtualDom
 
 
 {-| Converts nodes to virtual dom nodes.

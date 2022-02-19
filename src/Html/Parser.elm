@@ -260,7 +260,7 @@ element =
                         |. Parser.chompIf ((==) '>')
 
                 else if name == "script" then
-                    -- <script> can contain JavaScript operator '<' which confuses `cosingTag` parser so:
+                    -- <script> can contain JavaScript operator '<' which confuses `closingTag` parser so:
                     --
                     -- * look for `</script>` exactly to close the tag
                     -- * UNLESS it is contained in a JavaScript string or comment

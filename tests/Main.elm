@@ -214,7 +214,8 @@ documentTests =
     //""" ]
                             , Text "\n    "
                             , Element "script" [] [ Text """
-        var stringWithScript = "<script></script> inside JavaScript string must be ignored";
+        var dqStringWithScript = "<script></script> inside JavaScript double-quoted string must be ignored";
+        var sqStringWithScript = '<script></script> inside JavaScript single-quoted string must be ignored';
         var templateWithScript = `<script></script> inside JavaScript template literal must be ignored; ${"even interpolated <script></script>"}`;
         // <script></script> inside JavaScript line comment must be ignored
         /*
@@ -261,7 +262,8 @@ realWorld1 =
     document.write('<script src="inline.js"></script>');
     //--></script>
     <script>
-        var stringWithScript = "<script></script> inside JavaScript string must be ignored";
+        var dqStringWithScript = "<script></script> inside JavaScript double-quoted string must be ignored";
+        var sqStringWithScript = '<script></script> inside JavaScript single-quoted string must be ignored';
         var templateWithScript = `<script></script> inside JavaScript template literal must be ignored; ${"even interpolated <script></script>"}`;
         // <script></script> inside JavaScript line comment must be ignored
         /*

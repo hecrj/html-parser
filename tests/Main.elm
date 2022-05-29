@@ -348,6 +348,8 @@ errorTests =
         , test "wrong DOCTYPE keyword" (testDocumentError "<!DOCTYRP html><html></html>")
         , test "wrong DOCTYPE" (testDocumentError "<!DOCTYPE httl><html></html>")
         , test "wrong html tag" (testDocumentError "<!DOCTYPE html><document></document>")
+        , test "incomplete script1" (testDocumentError "<script>")
+        , test "incomplete script2 (PR#18 comment)" (testDocumentError "<script>'")
         ]
 
 

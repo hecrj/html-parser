@@ -360,7 +360,7 @@ stringHelp terminatorChar terminatorStr acc =
             |= justOneChar
         , Parser.token terminatorStr
             |> Parser.map (\_ -> Parser.Done acc)
-        , Parser.chompWhile (\char -> char /= '\\' && char /= terminatorChar)
+        , chompOneOrMore (\char -> char /= '\\' && char /= terminatorChar)
             |> Parser.getChompedString
             |> Parser.map (\chunk -> Parser.Loop (acc ++ chunk))
         ]

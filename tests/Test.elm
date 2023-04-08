@@ -1,4 +1,4 @@
-module Main exposing (suite)
+module Test exposing (suite)
 
 import Dict
 import Expect exposing (Expectation)

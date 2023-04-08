@@ -259,12 +259,120 @@ element =
                             ]
                         |. Parser.chompIf ((==) '>')
 
+                else if name == "script" then
+                    -- <script> can contain JavaScript operator '<' which confuses `closingTag` parser so:
+                    --
+                    -- * look for `</script>` exactly to close the tag
+                    -- * UNLESS it is contained in a JavaScript string or comment
+                    --
+                    -- In essence, we provide partial JavaScript parser here
+                    Parser.succeed (Element name attributes)
+                        |. Parser.chompIf ((==) '>')
+                        |= consumeJavaScriptUntilClosingTag
+
                 else
                     Parser.succeed (Element name attributes)
                         |. Parser.chompIf ((==) '>')
                         |= many (Parser.backtrackable node)
                         |. closingTag name
             )
+
+
+consumeJavaScriptUntilClosingTag : Parser (List Node)
+consumeJavaScriptUntilClosingTag =
+    Parser.loop [] <|
+        \acc ->
+            let
+                accumulate newNode =
+                    Parser.Loop <|
+                        case ( acc, newNode ) of
+                            ( [], first ) ->
+                                [ first ]
+
+                            ( (Text accChunk) :: tail, Text newChunk ) ->
+                                -- Merge top-most text node unless HTML comment nodes are interleaved
+                                Text (accChunk ++ newChunk) :: tail
+
+                            ( nonTextNode :: tail, _ ) ->
+                                newNode :: nonTextNode :: tail
+            in
+            Parser.oneOf
+                [ -- HTML comments are, albeit considered a bad practice recently,
+                  -- allowed inside <script> to hide scripts from really ancient web browser
+                  comment
+                    |> Parser.map accumulate
+                , Parser.lineComment "//"
+                    |> Parser.getChompedString
+                    |> Parser.map (Text >> accumulate)
+                , Parser.multiComment "/*" "*/" Parser.NotNestable
+                    |> Parser.getChompedString
+                    |> Parser.map (Text >> accumulate)
+                , javaScriptStringLike '"'
+                    |> Parser.map (Text >> accumulate)
+                , javaScriptStringLike '\''
+                    |> Parser.map (Text >> accumulate)
+                , javaScriptStringLike '`'
+                    |> Parser.map (Text >> accumulate)
+                , closingScriptTag
+                    |> Parser.map (\() -> Parser.Done (List.reverse acc))
+                , Parser.chompIf (always True)
+                    |> Parser.getChompedString
+                    |> Parser.map (Text >> accumulate)
+                ]
+
+
+closingScriptTag : Parser ()
+closingScriptTag =
+    Parser.token "</"
+        |. (Parser.chompWhile (\char -> char /= '>' && not (isSpaceCharacter char))
+                |> Parser.getChompedString
+                |> Parser.andThen
+                    (\chunk ->
+                        if String.toLower chunk == "script" then
+                            Parser.succeed ()
+
+                        else
+                            Parser.problem "not a </script>"
+                    )
+           )
+        |. Parser.chompWhile isSpaceCharacter
+        |. Parser.token ">"
+
+
+javaScriptStringLike : Char -> Parser String
+javaScriptStringLike terminatorChar =
+    let
+        terminatorStr =
+            String.fromChar terminatorChar
+    in
+    Parser.succeed identity
+        |. Parser.token terminatorStr
+        |= Parser.loop "" (stringHelp terminatorChar terminatorStr)
+        -- Restoring original shape
+        |> Parser.map (\chunk -> terminatorStr ++ chunk ++ terminatorStr)
+
+
+stringHelp : Char -> String -> String -> Parser (Parser.Step String String)
+stringHelp terminatorChar terminatorStr acc =
+    Parser.oneOf
+        [ Parser.succeed (\char -> Parser.Loop (acc ++ "\\" ++ char))
+            |. Parser.token "\\"
+            |= justOneChar
+        , Parser.token terminatorStr
+            |> Parser.map (\_ -> Parser.Done acc)
+        , chompOneOrMore (\char -> char /= '\\' && char /= terminatorChar)
+            |> Parser.getChompedString
+            |> Parser.map (\chunk -> Parser.Loop (acc ++ chunk))
+        ]
+
+
+justOneChar : Parser String
+justOneChar =
+    Parser.loop () <|
+        \_ ->
+            Parser.chompIf (always True)
+                |> Parser.getChompedString
+                |> Parser.map Parser.Done
 
 
 tagName : Parser String

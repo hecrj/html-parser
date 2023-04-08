@@ -1,4 +1,4 @@
-module Main exposing (suite)
+module MainTests exposing (suite)
 
 import Dict
 import Expect exposing (Expectation)
@@ -164,7 +164,115 @@ documentTests =
         [ test "minimal" (testParseDocument "<!DOCTYPE html><html></html>" (Html.Parser.Document [] "" [] ( [], [] ) []))
         , test "example1" (testParseDocument "<!--Early!--><!DOCTYPE html LEGACY \"My legacy string stuff\"><!--Teehee!--><html><p>Got it.</p><br></html><!--Smelly feet-->" { doctype = "LEGACY \"My legacy string stuff\"", document = ( [], [ Element "p" [] [ Text "Got it." ], Element "br" [] [] ] ), postdocComments = [ "Smelly feet" ], preambleComments = [ "Early!" ], predocComments = [ "Teehee!" ] })
         , test "recapitalized1" (testParseDocument "<!--EaRlY!--><!DoCtYpE HtMl lEgAcY \"mY LeGaCy StRiNg StUfF\"><!--tEeHeE!--><HtMl><P>gOt It.</P><bR></HtMl><!--sMeLlY fEeT-->" { doctype = "lEgAcY \"mY LeGaCy StRiNg StUfF\"", document = ( [], [ Element "p" [] [ Text "gOt It." ], Element "br" [] [] ] ), postdocComments = [ "sMeLlY fEeT" ], preambleComments = [ "EaRlY!" ], predocComments = [ "tEeHeE!" ] })
+        , test "realWorld1"
+            (testParseDocument realWorld1
+                { preambleComments = []
+                , doctype = ""
+                , predocComments = []
+                , postdocComments = []
+                , document =
+                    ( []
+                    , [ Text "\n  "
+                      , Element "head"
+                            []
+                            [ Text "\n    "
+                            , Element "meta" [ ( "charset", "utf-8" ) ] []
+                            , Text "\n    "
+                            , Element "title" [] [ Text "Title" ]
+                            , Text "\n    "
+                            , Element "link" [ ( "rel", "stylesheet" ), ( "href", "/style.css" ) ] []
+                            , Text "\n    "
+                            , Element "link" [ ( "rel", "canonical" ), ( "href", "https://example.com" ) ] []
+                            , Text "\n    "
+                            , Element "script" [ ( "async", "" ), ( "type", "text/javascript" ), ( "src", "https://external.example.com/script.js" ) ] []
+                            , Text "\n    "
+                            , Comment " Google Analytics "
+                            , Text "\n    "
+                            , Element "script" [ ( "async", "" ), ( "src", "https://www.googletagmanager.com/gtag/js?id=xxxxxxxx" ) ] []
+                            , Text "\n    "
+                            , Element "script" [] [ Text """
+        /**
+            Block comments
+        */
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'xxxxxxxx');
+    """ ]
+                            , Text "\n  "
+                            ]
+                      , Text "\n  "
+                      , Element "body"
+                            []
+                            [ Text "\n    "
+                            , Element "div" [ ( "id", "root" ) ] []
+                            , Text "\n    "
+                            , Element "script" [] [ Comment """
+    // Ancient Browser Workaround
+    // Hiding <script> contents
+    document.write('<script src="inline.js"></script>');
+    //""" ]
+                            , Text "\n    "
+                            , Element "script" [] [ Text """
+        var dqStringWithScript = "<script></script> inside JavaScript double-quoted string must be ignored";
+        var sqStringWithScript = '<script></script> inside JavaScript single-quoted string must be ignored';
+        var templateWithScript = `<script></script> inside JavaScript template literal must be ignored; ${"even interpolated <script></script>"}`;
+        // <script></script> inside JavaScript line comment must be ignored
+        /*
+            <script></script> inside JavaScript multiline comment must be ignored
+        */
+    """ ]
+                            , Text "\n  "
+                            ]
+                      , Text "\n"
+                      ]
+                    )
+                }
+            )
         ]
+
+
+realWorld1 : String
+realWorld1 =
+    """<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="canonical" href="https://example.com">
+    <script async type='text/javascript' src='https://external.example.com/script.js'></script>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=xxxxxxxx"></script>
+    <script>
+        /**
+            Block comments
+        */
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'xxxxxxxx');
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script><!--
+    // Ancient Browser Workaround
+    // Hiding <script> contents
+    document.write('<script src="inline.js"></script>');
+    //--></script>
+    <script>
+        var dqStringWithScript = "<script></script> inside JavaScript double-quoted string must be ignored";
+        var sqStringWithScript = '<script></script> inside JavaScript single-quoted string must be ignored';
+        var templateWithScript = `<script></script> inside JavaScript template literal must be ignored; ${"even interpolated <script></script>"}`;
+        // <script></script> inside JavaScript line comment must be ignored
+        /*
+            <script></script> inside JavaScript multiline comment must be ignored
+        */
+    </script>
+  </body>
+</html>
+"""
 
 
 documentToStringTests : Test
@@ -240,6 +348,8 @@ errorTests =
         , test "wrong DOCTYPE keyword" (testDocumentError "<!DOCTYRP html><html></html>")
         , test "wrong DOCTYPE" (testDocumentError "<!DOCTYPE httl><html></html>")
         , test "wrong html tag" (testDocumentError "<!DOCTYPE html><document></document>")
+        , test "incomplete script1" (testDocumentError "<script>")
+        , test "incomplete script2 (PR#18 comment)" (testDocumentError "<script>'")
         ]
 
 
@@ -254,6 +364,5 @@ suite =
         , commentTests
         , attributeTests
         , errorTests
-
-        --, scriptTests
+        , scriptTests
         ]
